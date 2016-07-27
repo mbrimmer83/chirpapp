@@ -1,4 +1,21 @@
 {% extends "layout.html" %}
 {% block body %}
-<h1>Login</h1>
+<div class="container">
+  <div class="row">
+    {{message}}
+    <div >
+      <form action="/log_in" method="POST">
+        <p>
+          <label for="username">Username</label><br>
+          <input name="username"></input>
+        </p>
+        <p>
+          <label for="password">Password</label><br>
+          <input name="password"></input>
+        </p>
+        <p>
+          <button class="btn btn-primary" type="subimt">Login</button>
+        </p>
+      </form>
+    </div>
 {% endblock %}
