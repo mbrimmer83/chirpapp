@@ -1,0 +1,45 @@
+h1 {
+  color: green;
+}
+.header {
+  background-color: #337ab7;
+  border: solid 2px black;
+  color: white;
+  font-size: 25px;
+  position: absolute;
+  top: 50px;
+  height: 100px;
+  min-width: 100%;
+}
+.profileBox {
+  border: solid 2px black;
+  position: absolute;
+  top: 150px;
+  left: 0;
+  max-width: 25%;
+  min-height: 25%;
+}
+.tweetBox {
+  position: absolute;
+  border: solid 2px black;
+  left: 25%;
+  max-width: 75%;
+  min-height: 75%;
+  top: 150px;
+}
+.tweet {
+  list-style: none;
+  border: solid 2px black
+  padding: 5px;
+  margin-bottom: 5px;
+}
+.userDate {
+  margin-left: 10px;
+  font-size: 20px;
+}
+.tweetContent {
+  margin-left: 20px;
+}
+.likes {
+  margin-left: 10px;
+}

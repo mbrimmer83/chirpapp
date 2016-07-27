@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div >
+      <form action="/sign-up" method="POST">
+        <p>
+          <label for="content">Name</label><br>
+          <input name="name"></input>
+        </p>
+        <p>
+          <label for="email">Email</label><br>
+          <input name="email"></input>
+        </p>
+        <p>
+          <label for="username">Username, This will be your handle</label><br>
+          <input name="username"></input>
+        </p>
+        <p>
+          <label for="password">Password</label><br>
+          <input name="password"></input>
+        </p>
+        <p>
+          <button class="btn btn-primary" type="subimt">Signup</button>
+        </p>
+      </form>
+    </div>
+{% endblock %}
