@@ -40,29 +40,8 @@ def timeline():
         query2 = db.query('''select count(tweets.tweetid) from tweets inner join users on tweets.user_id = users.id where users.id = $1''',1)
         query3 = db.query('''select count(follow.id) from follow where follow.followee = $1''',session['id'])
         query4 = db.query('''select count(follow.id) from follow where follow.follower = $1''',session['id'])
-        query5 = db.query('''select
-        	timeline.tweet_content, timeline.tweet_date_time, users.username, timeline.likes, timeline.retweet_num
-        from
-        (select
-          	tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num
-        from
-        	tweets
-        inner join
-          	follow on tweets.user_id = follow.followee
-        where
-        	follow.follower = $1
-        union
-        select
-            tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num
-        from
-          	tweets
-        where
-         	tweets.user_id = $1) as timeline
-        inner join
-        	users on timeline.user_id = users.id
-        order by
-        	tweet_date_time
-            ''',session['id'])
+        query5 = db.query('''select timeline.tweet_content, timeline.tweet_date_time, users.username, timeline.likes, timeline.retweet_num from (select tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num from tweets
+        inner join follow on tweets.user_id = follow.followee where follow.follower = $1 union select tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num from tweets where tweets.user_id = $1) as timeline inner join users on timeline.user_id = users.id order by tweet_date_time''',session['id'])
         print query5.namedresult()
         return render_template(
             'timeline.html',
