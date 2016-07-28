@@ -5,27 +5,15 @@
     {{user.name}} Timeline
   </div>
 </div>
-<div class="container profileBox">
+<div class="container timelineBox pre-scrollable">
   <div class="row">
-    <div class="col-md-6">
-      <img class="profile" src="/images/slide4.png" alt="" /><br>
-      <button class="btn btn-primary" type="submit" name="follow">Follow</button>
-    </div>
-    <div class="col-md-6">
-      {{user.username}}<br>
-      Followers: {{follower.count}} | Following: {{followee.count}} <br>
-      Tweets: {{tweets.count}}
-    </div>
-  </div>
-</div>
-<div class="container tweetBox pre-scrollable">
-  <div class="row">
+    <form action="/like_retweet" method="POST">
     <ul>
       {% for tweet in timeline_tweets %}
       <div class="well">
         <li class="tweet">
           <p class="userDate">
-          {{tweet.username}} | {{tweet.tweet_date_time.strftime('%b-%d-%Y')}}<br>
+          <a href="/users/{{tweet.username}}">{{tweet.username}}</a> | {{tweet.tweet_date_time.strftime('%b-%d-%Y')}}<br>
           <br>
         </p>
         <p class="tweetContent">
@@ -33,12 +21,14 @@
           <br>
         </p>
         <p class="likes">
-          Likes: {{tweet.likes}} | Retweets: {{tweet.retweet_num}}<br>
+          <button type="submit" name="likes" value="{{tweet.tweetid}} {{tweet.username}}"><span class="glyphicon glyphicon-heart chirpLikes" aria-hidden="true"> {{tweet.likes}}</span></button>
+          <button type="submit" name="retweets" value="{{tweet.tweetid}} {{tweet.username}}"><span class="glyphicon glyphicon-share-alt rechirps" aria-hidden="true"> {{tweet.retweet_num}}</span></button>
         </p>
         </li>
       </div>
       {% endfor %}
     </ul>
+  </form>
   </div>
 </div>
 {% endblock %}

@@ -1,4 +1,34 @@
 {% extends "layout.html" %}
 {% block body %}
-<h1>Home</h1>
+<div class="container header">
+  <div class="row">
+    Welcome to Chirp!
+  </div>
+</div>
+<div class="container timelineBox pre-scrollable">
+  <div class="row">
+    <form action="/like_retweet" method="POST">
+    <ul>
+      {% for tweet in tweets %}
+      <div class="well">
+        <li class="tweet">
+          <p class="userDate">
+          <a href="/users/{{tweet.username}}">{{tweet.username}}</a> | {{tweet.tweet_date_time.strftime('%b-%d-%Y')}}<br>
+          <br>
+        </p>
+        <p class="tweetContent">
+          {{tweet.tweet_content}}<br>
+          <br>
+        </p>
+        <p class="likes">
+          <button type="submit" name="likes" value="{{tweet.tweetid}} {{tweet.username}}"><span class="glyphicon glyphicon-heart chirpLikes" aria-hidden="true"> {{tweet.likes}}</span></button>
+          <button type="submit" name="retweets" value="{{tweet.tweetid}} {{tweet.username}}"><span class="glyphicon glyphicon-share-alt rechirps" aria-hidden="true"> {{tweet.retweet_num}}</span></button>
+        </p>
+        </li>
+      </div>
+      {% endfor %}
+    </ul>
+  </form>
+  </div>
+</div>
 {% endblock %}

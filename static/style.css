@@ -11,6 +11,13 @@ h1 {
   height: 100px;
   min-width: 100%;
 }
+.profile {
+  width: 300px;
+  height: 250px;
+}
+.followBtn {
+  margin-top: 15px;
+}
 .profileBox {
   border: solid 2px black;
   position: absolute;
@@ -27,6 +34,15 @@ h1 {
   min-height: 75%;
   top: 150px;
 }
+.timelineBox {
+  position: absolute;
+  width: 60%;
+  top: 150px;
+  min-height: 75%;
+}
+.well {
+  margin-left: 10%;
+}
 .tweet {
   list-style: none;
   border: solid 2px black
@@ -42,4 +58,18 @@ h1 {
 }
 .likes {
   margin-left: 10px;
+}
+.chirpLikes {
+  margin-left: 5px;
+}
+.rechirps {
+  margin-left: 5px;
+}
+.chirpBox {
+  font-size: 15px;
+  color: black;
+}
+.listLogin {
+  display: inline;
+  float: right;
 }

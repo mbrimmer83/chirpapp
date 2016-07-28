@@ -9,8 +9,10 @@ app = Flask('ChirpApp')
 
 @app.route('/')
 def home():
+    query1 = db.query('''select * from tweets inner join users on users.id = tweets.user_id order by tweets.tweet_date_time''')
     return render_template(
-    'home.html'
+    'home.html',
+    tweets = query1.namedresult()
     )
 
 
@@ -18,7 +20,7 @@ def home():
 def profile():
     if 'id' in session:
         query1 = db.query('''select * from users where users.id = $1''',session['id'])
-        query2 = db.query('''select count(tweets.tweetid) from tweets inner join users on tweets.user_id = users.id where users.id = $1''',1)
+        query2 = db.query('''select count(tweets.tweetid) from tweets inner join users on tweets.user_id = users.id where users.id = $1''',session['id'])
         query3 = db.query('''select count(follow.id) from follow where follow.followee = $1''',session['id'])
         query4 = db.query('''select count(follow.id) from follow where follow.follower = $1''',session['id'])
         query5 = db.query('''select * from tweets where tweets.user_id = $1 order by tweet_date_time''',session['id'])
@@ -40,9 +42,9 @@ def timeline():
         query2 = db.query('''select count(tweets.tweetid) from tweets inner join users on tweets.user_id = users.id where users.id = $1''',1)
         query3 = db.query('''select count(follow.id) from follow where follow.followee = $1''',session['id'])
         query4 = db.query('''select count(follow.id) from follow where follow.follower = $1''',session['id'])
-        query5 = db.query('''select timeline.tweet_content, timeline.tweet_date_time, users.username, timeline.likes, timeline.retweet_num from (select tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num from tweets
-        inner join follow on tweets.user_id = follow.followee where follow.follower = $1 union select tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num from tweets where tweets.user_id = $1) as timeline inner join users on timeline.user_id = users.id order by tweet_date_time''',session['id'])
-        print query5.namedresult()
+        query5 = db.query('''select timeline.tweetid, timeline.tweet_content, timeline.tweet_date_time, users.username, timeline.likes, timeline.retweet_num from (select tweets.tweetid, tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num from tweets
+        inner join follow on tweets.user_id = follow.followee where follow.follower = $1 union select tweets.tweetid, tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num from tweets where tweets.user_id = $1) as timeline inner join users on timeline.user_id = users.id order by tweet_date_time
+        ''',session['id'])
         return render_template(
             'timeline.html',
             user = query1.namedresult()[0],
@@ -85,8 +87,7 @@ def sign_up():
     else:
         db.query('''insert into users values(default, $1, $2, $3, $4)''',name,email,username,hashed)
         return redirect(
-        '/login',
-        message = 'Welcome $1, please login!'
+        '/login'
         )
 
 
@@ -109,6 +110,7 @@ def log_in():
             print 'It matches!'
             session['id'] = query1.namedresult()[0].id
             session['name'] = query1.namedresult()[0].name
+            session['username'] = query1.namedresult()[0].username
             return redirect('/')
         else:
             print 'It doesnt match'
@@ -117,20 +119,69 @@ def log_in():
             )
     return redirect('/')
 
+@app.route('/users/<username>')
+def user_profile(username):
+    query = db.query('''select users.id from users where users.username = $1''',username)
+    query1 = db.query('''select * from users where users.id = $1''',query.namedresult()[0].id)
+    query2 = db.query('''select count(tweets.tweetid) from tweets inner join users on tweets.user_id = users.id where users.id = $1''',query.namedresult()[0].id)
+    query3 = db.query('''select count(follow.id) from follow where follow.followee = $1''',query.namedresult()[0].id)
+    query4 = db.query('''select count(follow.id) from follow where follow.follower = $1''',query.namedresult()[0].id)
+    query5 = db.query('''select * from tweets where tweets.user_id = $1 order by tweet_date_time''',query.namedresult()[0].id)
+    query6 = db.query('''select case when count(*) = 1 then TRUE else FALSE end from follow where follow.followee = $1 and follow.follower = $2''',query.namedresult()[0].id, session['id'])
+    print query6.namedresult()[0].case
+    return render_template(
+        'profile.html',
+        user = query1.namedresult()[0],
+        tweets = query2.namedresult()[0],
+        followee = query3.namedresult()[0],
+        follower = query4.namedresult()[0],
+        tweetcontent = query5.namedresult(),
+        follow_status = query6.namedresult()[0].case
+        )
+
 @app.route('/resetpassword')
 def resetpassword():
-    pass
-@app.route('/follow')
-def follow():
-    print 'follow'
+    print 'resetpassword'
 
-@app.route('/like')
+@app.route('/follow/<username>', methods=['POST'])
+def follow(username):
+    query = db.query('''select users.id from users where users.username = $1''',username)
+    query1 = db.query('''insert into follow values(default, $1, $2)''',session['id'],query.namedresult()[0].id)
+    return redirect(request.referrer)
+
+@app.route('/chirp', methods=['POST'])
+def chirp():
+    user_id = session['id']
+    chirp = request.form['chirp']
+    if chirp:
+        db.query('''insert into tweets values(default, $1, default, $2, 0, 0, FALSE, null)''',user_id, chirp)
+        return redirect(
+        '/profile'
+        )
+
+@app.route('/like_retweet', methods=['POST'])
 def like():
-    print 'Like'
+    if request.form['likes']:
+        the_likes = request.form['likes'].split(" ")
+    elif request.form['retweets']:
+        the_retweets = request.form['retweets'].split(" ")
+    if session['id'] and the_likes[1] != session['username'] and the_likes[0]:
+        db.query('''update tweets set likes = likes + 1 where tweets.tweetid = $1''',the_likes[0])
+    elif session['id'] and the_retweets[1] != session['username'] and the_retweets[0]:
+        print 'A retweet has occurred!'
+    else:
+        return redirect(request.referrer)
+    return redirect(request.referrer)    
+@app.route('/unfollow/<username>', methods=['POST'])
+def un_follow(username):
+    db.query('''delete from follow where follow.followee = (select users.id from users where users.username = $1) and follow.follower = $2''',username, session['id'],)
+    return redirect(request.referrer)
 
-@app.route('/retweet')
-def retweet():
-    print 'Retweet'
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
 
 app.secret_key = 'SJKD9230SKJB8U23KBSV76T32KJB975KKS83DSI29HD4TD7V'
 

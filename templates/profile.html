@@ -2,43 +2,72 @@
 {% block body %}
 <div class="container header">
   <div class="row">
-    {{user.name}} Profile
+    <div class="col-md-6">
+      {{user.username}} Profile<br>
+      {{message}}
+    </div>
+    <div class="col-md-6">
+      {% if session['id'] == user.id%}
+      <form action="/chirp" method="POST" class="chirpBox">
+        <label for="chirp">Chirp</label><br>
+        <textarea name="chirp" rows="2" cols="50"></textarea>
+        <button class="btn btn-primary" type="submit">Chirp</button>
+      </form>
+      {% else%}
+      {% endif %}
+    </div>
   </div>
 </div>
 <div class="container profileBox">
   <div class="row">
     <div class="col-md-6">
-      <img class="profile" src="/images/slide4.png" alt="" /><br>
-      <button class="btn btn-primary" type="submit" name="follow">Follow</button>
+      <img class="profile" src="http://pickaface.net/includes/themes/clean/img/slide4.png" alt="" /><br>
     </div>
-    <div class="col-md-6">
+  </div>
+  <div class="row">
+    <div class="col-xs-6">
+      {% if session['username'] == user.username%}
+      {% elif follow_status == True %}
+      <form action="/unfollow/{{user.username}}" method="POST">
+        <button class="btn btn-primary followBtn" type="submit" name="follow" value="{{user.username}}">Unfollow</button>
+      </form>
+      {% else %}
+      <form action="/follow/{{user.username}}" method="POST">
+        <button class="btn btn-primary followBtn" type="submit" name="unfollow" value="{{user.username}}">Follow</button>
+      </form>
+      {% endif %}
+    </div>
+    <div class="col-xs-6">
       {{user.username}}<br>
-      Followers: {{follower.count}} | Following: {{followee.count}} <br>
-      Tweets: {{tweets.count}}
+      Followers: {{followee.count}} | Following: {{follower.count}} <br>
+      Chirps: {{tweets.count}}
     </div>
   </div>
 </div>
 <div class="container tweetBox pre-scrollable">
   <div class="row">
-    <ul>
-      {% for tweet in tweetcontent %}
-      <div class="well">
-        <li class="tweet">
-          <p class="userDate">
-          {{user.username}} | {{tweet.tweet_date_time.strftime('%b-%d-%Y')}}<br>
-          <br>
-        </p>
-        <p class="tweetContent">
-          {{tweet.tweet_content}}<br>
-          <br>
-        </p>
-        <p class="likes">
-          Likes: {{tweet.likes}} | Retweets: {{tweet.retweet_num}}<br>
-        </p>
-        </li>
-      </div>
-      {% endfor %}
-    </ul>
+    <form action="/like_retweet" method="POST">
+      <ul>
+        {% for tweet in tweetcontent %}
+        <div class="well">
+          <li class="tweet">
+            <p class="userDate">
+              <a href="/users/{{user.username}}">{{user.username}}</a> | {{tweet.tweet_date_time.strftime('%b-%d-%Y')}}<br>
+              <br>
+            </p>
+            <p class="tweetContent">
+              {{tweet.tweet_content}}<br>
+              <br>
+            </p>
+            <p class="likes">
+              <button type="submit" name="likes" value="{{tweet.tweetid}} {{user.username}}"><span class="glyphicon glyphicon-heart chirpLikes" aria-hidden="true"> {{tweet.likes}}</span></button>
+              <button type="submit" name="retweets" value="{{tweet.tweetid}} {{user.username}}"><span class="glyphicon glyphicon-share-alt rechirps" aria-hidden="true"> {{tweet.retweet_num}}</span></button>
+            </p>
+          </li>
+        </div>
+        {% endfor %}
+      </ul>
+    </form>
   </div>
 </div>
 {% endblock %}
