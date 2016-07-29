@@ -11,6 +11,7 @@
     <ul>
       {% for tweet in timeline_tweets %}
       <div class="well">
+        {% if tweet.retweet_user_name == None %}
         <li class="tweet">
           <p class="userDate">
           <a href="/users/{{tweet.username}}">{{tweet.username}}</a> | {{tweet.tweet_date_time.strftime('%b-%d-%Y')}}<br>
@@ -25,6 +26,22 @@
           <button type="submit" name="retweets" value="{{tweet.tweetid}} {{tweet.username}}"><span class="glyphicon glyphicon-share-alt rechirps" aria-hidden="true"> {{tweet.retweet_num}}</span></button>
         </p>
         </li>
+        {% else %}
+        <li class="tweet">
+          <p class="userDate">
+          <a href="/users/{{tweet.username}}">{{tweet.username}}</a> | {{tweet.tweet_date_time.strftime('%b-%d-%Y')}}<br>
+          <br>
+        </p>
+        <p class="tweetContent">
+          {{tweet.tweet_content}}<br>
+          <br>
+        </p>
+        <p class="likes">
+          <button type="submit" name="likes" value="{{tweet.tweetid}} {{tweet.username}}"><span class="glyphicon glyphicon-heart chirpLikes" aria-hidden="true"> {{tweet.likes}}</span></button>
+          <button type="submit" name="retweets" value="{{tweet.tweetid}} {{tweet.username}}"><span class="glyphicon glyphicon-share-alt rechirps" aria-hidden="true"> {{tweet.retweet_num}}</span></button><span class="rechirp">Rechirp from: <a href="/users/{{tweet.retweet_user_name}}">{{tweet.retweet_user_name}}</a></span>
+        </p>
+        </li>
+        {% endif %}
       </div>
       {% endfor %}
     </ul>

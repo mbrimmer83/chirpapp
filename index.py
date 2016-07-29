@@ -42,8 +42,8 @@ def timeline():
         query2 = db.query('''select count(tweets.tweetid) from tweets inner join users on tweets.user_id = users.id where users.id = $1''',1)
         query3 = db.query('''select count(follow.id) from follow where follow.followee = $1''',session['id'])
         query4 = db.query('''select count(follow.id) from follow where follow.follower = $1''',session['id'])
-        query5 = db.query('''select timeline.tweetid, timeline.tweet_content, timeline.tweet_date_time, users.username, timeline.likes, timeline.retweet_num from (select tweets.tweetid, tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num from tweets
-        inner join follow on tweets.user_id = follow.followee where follow.follower = $1 union select tweets.tweetid, tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num from tweets where tweets.user_id = $1) as timeline inner join users on timeline.user_id = users.id order by tweet_date_time
+        query5 = db.query('''select timeline.tweetid, timeline.tweet_content, timeline.tweet_date_time, users.username, timeline.likes, timeline.retweet_num,timeline.retweet_user_name from (select tweets.tweetid, tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num, tweets.retweet_user_name from tweets
+        inner join follow on tweets.user_id = follow.followee where follow.follower = $1 union select tweets.tweetid, tweets.tweet_content, tweets.tweet_date_time, tweets.user_id, tweets.likes, tweets.retweet_num,tweets.retweet_user_name from tweets where tweets.user_id = $1) as timeline inner join users on timeline.user_id = users.id order by tweet_date_time
         ''',session['id'])
         return render_template(
             'timeline.html',
@@ -154,24 +154,34 @@ def chirp():
     user_id = session['id']
     chirp = request.form['chirp']
     if chirp:
-        db.query('''insert into tweets values(default, $1, default, $2, 0, 0, FALSE, null)''',user_id, chirp)
+        db.query('''insert into tweets values(default, $1, default, $2, 0, 0, null)''',user_id, chirp)
         return redirect(
         '/profile'
         )
 
 @app.route('/like_retweet', methods=['POST'])
 def like():
-    if request.form['likes']:
+    print request.form
+    if request.form.get('likes'):
+        print request.form['likes']
         the_likes = request.form['likes'].split(" ")
-    elif request.form['retweets']:
+        if session['id'] and the_likes[1] != session['username'] and the_likes[0]:
+            db.query('''update tweets set likes = likes + 1 where tweets.tweetid = $1''',the_likes[0])
+            return redirect(request.referrer)
+
+    elif request.form.get('retweets'):
         the_retweets = request.form['retweets'].split(" ")
-    if session['id'] and the_likes[1] != session['username'] and the_likes[0]:
-        db.query('''update tweets set likes = likes + 1 where tweets.tweetid = $1''',the_likes[0])
-    elif session['id'] and the_retweets[1] != session['username'] and the_retweets[0]:
-        print 'A retweet has occurred!'
+        print the_retweets
+        if session['id'] and the_retweets[1] != session['username'] and the_retweets[0]:
+            query1 = db.query('''select tweets.tweet_content from tweets where tweets.tweetid = $1''',the_retweets[0])
+            print query1.namedresult()[0].tweet_content
+            db.query('''insert into tweets values(default, $1, default, $2, 0, 0, $3)''',session['id'], query1.namedresult()[0].tweet_content, the_retweets[1])
+            db.query(''' update tweets set retweet_num = retweet_num + 1 where tweets.tweetid = $1''',the_retweets[0])
+            print 'A retweet has occurred!'
+            return redirect(request.referrer)
     else:
         return redirect(request.referrer)
-    return redirect(request.referrer)    
+    return redirect(request.referrer)
 @app.route('/unfollow/<username>', methods=['POST'])
 def un_follow(username):
     db.query('''delete from follow where follow.followee = (select users.id from users where users.username = $1) and follow.follower = $2''',username, session['id'],)

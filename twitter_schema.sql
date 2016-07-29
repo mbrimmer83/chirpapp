@@ -9,19 +9,19 @@ CREATE TABLE users (
 CREATE TABLE tweets (
   tweetid serial PRIMARY KEY,
   user_id integer REFERENCES users (id),
-  tweet_date_time default current timestamp,
-  tweet_content varchar (141)
+  tweet_date_time timestamp default current_timestamp,
+  tweet_content varchar (141),
   likes integer,
   retweet_num integer,
-  retweets boolean,
-  retweet_id integer REFERENCES tweets (tweetid)
+  retweet_user_name varchar
 );
 
 insert into tweets values(default, 1, default, 'Hello World', 0, 0, FALSE, null);
 
 CREATE TABLE retweet (
-  tweetid serial PRIMARY KEY,
-  retweet_date_time default current timestamp,
+  retweetid serial PRIMARY KEY,
+  tweet_id integer REFERENCES tweets (tweetid),
+  retweet_date_time timestamp default current_timestamp,
   user_id integer REFERENCES users (id)
 );
 
