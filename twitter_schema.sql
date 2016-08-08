@@ -29,7 +29,7 @@ CREATE TABLE follow (
   id serial PRIMARY KEY,
   follower integer REFERENCES users (id),
   followee integer REFERENCES users (id)
-)
+);
 
 select
   *
