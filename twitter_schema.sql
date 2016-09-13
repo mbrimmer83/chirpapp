@@ -3,7 +3,8 @@ CREATE TABLE users (
   name varchar,
   email varchar,
   username varchar,
-  password varchar
+  password varchar,
+  pic_id integer
 );
 
 CREATE TABLE tweets (

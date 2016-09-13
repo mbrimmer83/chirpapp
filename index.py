@@ -109,6 +109,7 @@ def login():
     message = 'Please login!'
     )
 
+
 @app.route('/log_in', methods=['POST'])
 def log_in():
     username = request.form['username']
@@ -125,10 +126,26 @@ def log_in():
             return redirect('/')
         else:
             print 'It doesnt match'
-            return redirect('/login',
+            return render_template('login.html',
             message = 'Username or password doesnt match'
             )
     return redirect('/')
+
+@app.route('/users/<username>/settings')
+def settings(username):
+    pictures = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    return render_template(
+    'settings.html',
+    message = "Select your profile picture!",
+    profile_pictures = pictures
+    )
+
+@app.route('/users/<username>/settings/update', methods=['POST'])
+def update(username):
+    picture = request.form['profile_picture']
+    query1 = db.query('''update users set pic_id = $1 where users.username = $2''', picture, username)
+    return redirect('/users/%s' %username)
+
 
 @app.route('/users/<username>')
 def user_profile(username):

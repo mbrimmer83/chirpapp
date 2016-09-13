@@ -29,13 +29,12 @@
       <div id="navbarCollapse" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           {% if session['id'] == undefined %}
-          <li><a href="/profile">Profile</a></li>
-          <li><a href="/timeline">Timeline</a></li>
           <li class="listLogin"><a href="/login">Login</a></li>
           <li class="listLogin"><a href="/signup">Signup</a></li>
           {% else %}
-          <li><a href="/profile">Profile</a></li>
+          <li><a href="/users/{{session['username']}}">Profile</a></li>
           <li><a href="/timeline">Timeline</a></li>
+          <li><a href="/users/{{session['username']}}/settings">Settings</a></li>
           <li><a href="/logout">Logout</a></li>
           {% endif %}
         </ul>
