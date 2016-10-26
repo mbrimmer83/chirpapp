@@ -31,4 +31,41 @@
   </form>
   </div>
 </div>
+<div id="chirpModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Welcome to my Chirp application</h4>
+      </div>
+      <div class="modal-body">
+        <p>A full stack Twiiter clone that allows users to Chirp, follow and unfollow other users, like and rechirp chirps. Users can add and changes profie avatars and have custom timelines. </p>
+        <div class="modalList">
+        <h3>Languages and Technologies</h3>
+        <ul>
+          <li>Python</li>
+          <li>Javascript</li>
+          <li>Flask</li>
+          <li>Jinja</li>
+          <li>PostgreSQL</li>
+          <li>JQuery</li>
+          <li>Bootstrap</li>
+          <li>HTML</li>
+          <li>CSS</li>
+        </ul>
+        </div>
+        <div class="gitHub">
+          <a href="https://github.com/mbrimmer83/chirpapp">Chirp GitHub</a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default closeBtn" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(window).load(function(){
+    $('#chirpModal').modal('show');
+  });
+</script>
 {% endblock %}
